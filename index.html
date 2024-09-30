@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RedWeb</title>
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #ffffff;
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        h1 {
+            color: #ff0000;
+            margin-top: 20px;
+            animation: fadeInDown 1s ease-in-out;
+            text-shadow: 2px 2px 4px #000000;
+        }
+        .code-input {
+            margin: 20px 0;
+            animation: fadeInUp 1s ease-in-out;
+        }
+        .code-input input {
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #ff0000;
+            background-color: #333;
+            color: #fff;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+        }
+        .code-input input:focus {
+            outline: none;
+            border-color: #cc0000;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.7);
+        }
+        .code-input button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #ff0000;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+        }
+        .code-input button:hover {
+            background-color: #cc0000;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.7);
+            transform: scale(1.05);
+        }
+        .image-container {
+            margin-top: 20px;
+            animation: fadeIn 2s ease-in-out;
+        }
+        .image-container img {
+            width: 100%;
+            max-width: 300px;
+            filter: blur(45px);
+            transition: filter 0.3s ease, transform 0.3s ease;
+            pointer-events: none;
+            user-select: none;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+        }
+        .image-container img.clear {
+            filter: none;
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(255, 0, 0, 0.7);
+        }
+        .footer {
+            margin-top: 40px;
+            color: #888;
+            font-size: 14px;
+            animation: fadeIn 3s ease-in-out;
+        }
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        .glow {
+            animation: glow 1.5s infinite alternate;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes glow {
+            from { box-shadow: 0 0 10px rgba(255, 0, 0, 0.5); }
+            to { box-shadow: 0 0 20px rgba(255, 0, 0, 1); }
+        }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+    <h1 class="glow">RedWeb</h1>
+    <div class="code-input">
+        <input type="text" id="code" placeholder="Entrez le code">
+        <button onclick="validerCode()">Valider</button>
+    </div>
+    <div class="image-container">
+        <img id="image" src="https://th.bing.com/th/id/OIP.oIkJemyFP0PvaDfqkKIgfAAAAA?w=351&h=626&rs=1&pid=ImgDetMain" alt="Image floue">
+    </div>
+    <div class="footer">
+        © 2024 RedWeb
+    </div>
+    <canvas class="particles"></canvas>
+
+    <script>
+        function validerCode() {
+            const code = document.getElementById('code').value;
+            if (code === '0001') {
+                document.getElementById('image').classList.add('clear');
+            } else {
+                alert('Code incorrect');
+            }
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'F12' || (event.ctrlKey && event.shiftKey && event.key === 'I')) {
+                event.preventDefault();
+            }
+        });
+
+        document.addEventListener('contextmenu', function(event) {
+            event.preventDefault();
+        });
+
+        document.addEventListener('copy', function(event) {
+            event.clipboardData.setData('text/plain', 'Copie désactivée');
+            event.preventDefault();
+        });
+
+        document.addEventListener('dragstart', function(event) {
+            event.preventDefault();
+        });
+
+        document.addEventListener('selectstart', function(event) {
+            event.preventDefault();
+        });
+
+        // Particles effect
+        const canvas = document.querySelector('.particles');
+        const ctx = canvas.getContext('2d');
+        let particlesArray = [];
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', function() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        const mouse = {
+            x: null,
+            y: null,
+            radius: 100
+        };
+
+        window.addEventListener('mousemove', function(event) {
+            mouse.x = event.x;
+            mouse.y = event.y;
+        });
+
+        class Particle {
+            constructor(x, y, directionX, directionY, size, color) {
+                this.x = x;
+                this.y = y;
+                this.directionX = directionX;
+                this.directionY = directionY;
+                this.size = size;
+                this.color = color;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+
+            update() {
+                if (this.x > canvas.width || this.x < 0) {
+                    this.directionX = -this.directionX;
+                }
+                if (this.y > canvas.height || this.y < 0) {
+                    this.directionY = -this.directionY;
+                }
+
+                const dx = mouse.x - this.x;
+                const dy = mouse.y - this.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < mouse.radius + this.size) {
+                    if (mouse.x < this.x && this.x < canvas.width - this.size * 10) {
+                        this.x += 10;
+                    }
+                    if (mouse.x > this.x && this.x > this.size * 10) {
+                        this.x -= 10;
+                    }
+                    if (mouse.y < this.y && this.y < canvas.height - this.size * 10) {
+                        this.y += 10;
+                    }
+                    if (mouse.y > this.y && this.y > this.size * 10) {
+                        this.y -= 10;
+                    }
+                }
+
+                this.x += this.directionX;
+                this.y += this.directionY;
+                this.draw();
+            }
+        }
+
+        function init() {
+            particlesArray = [];
+            const numberOfParticles = (canvas.height * canvas.width) / 9000;
+            for (let i = 0; i < numberOfParticles; i++) {
+                const size = (Math.random() * 5) + 1;
+                const x = (Math.random() * (innerWidth - size * 2)) + size * 2;
+                const y = (Math.random() * (innerHeight - size * 2)) + size * 2;
+                const directionX = (Math.random() * 5) - 2.5;
+                const directionY = (Math.random() * 5) - 2.5;
+                const color = '#ff0000';
+
+                particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            ctx.clearRect(0, 0, innerWidth, innerHeight);
+
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+            }
+        }
+
+                function animate() {
+            requestAnimationFrame(animate);
+            ctx.clearRect(0, 0, innerWidth, innerHeight);
+
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+            }
+        }
+
+        init();
+        animate();
+    </script>
+</body>
+</html>
